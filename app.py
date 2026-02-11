@@ -1,17 +1,44 @@
-from flask import Flask, render_template, request
-import mysql.connector
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
-# MySQL connection
-"""db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
-    database="vulnerable_app"
-)
+# Fake in-memory database (Vercel safe)
+users = {
+    1: {"username": "admin", "password": "admin123", "role": "admin"},
+    2: {"username": "user1", "password": "user123", "role": "user"},
+    3: {"username": "user2", "password": "user123", "role": "user"}
+}
 
-cursor = db.cursor()"""
+user_details = {
+    1: {
+        "name": "Admin Kumar",
+        "age": 35,
+        "dob": "1989-05-10",
+        "phone": "9876543210",
+        "email": "admin@bank.com",
+        "aadhar": "123456789012",
+        "account": "111122223333"
+    },
+    2: {
+        "name": "Rahul",
+        "age": 22,
+        "dob": "2002-03-12",
+        "phone": "9123456780",
+        "email": "rahul@gmail.com",
+        "aadhar": "234567890123",
+        "account": "222233334444"
+    },
+    3: {
+        "name": "Priya",
+        "age": 23,
+        "dob": "2001-07-20",
+        "phone": "9234567810",
+        "email": "priya@gmail.com",
+        "aadhar": "345678901234",
+        "account": "333344445555"
+    }
+}
+
 
 @app.route("/")
 def login_page():
@@ -23,72 +50,36 @@ def login():
     username_input = request.form['username']
     password_input = request.form['password']
 
-    # Temporary login without database (for Render deployment)
+    # ❌ Vulnerability 1: Plain text password check
+    # ❌ Vulnerability 2: No session handling
+    # ❌ Vulnerability 3: No account lock / brute force protection
 
-    if username_input == "admin" and password_input == "admin123":
-        return "Login Success"
-    else:
-        return "Invalid Login"
+    for user_id, user in users.items():
+        if user["username"] == username_input and user["password"] == password_input:
+            return redirect(f"/dashboard/{user_id}")
+
+    return "Invalid Login"
 
 
-    if row:
-        # row = (id, username, password, role)
-        username = row[1]
-        user_id = row[0]
+@app.route("/dashboard/<int:user_id>")
+def dashboard(user_id):
 
-        
-        details = {
-            "name": username,
-            "age": 28,
-            "dob": "1997-05-12",
-            "phone": "9876543210",
-            "email": username + "@example.com",
-            "aadhar": "1234-5678-9012",
-            "account": "AC987654321"
-        }
+    # ❌ Vulnerability 4: Broken Access Control
+    # Anyone can change URL and view any user data
 
-        return render_template(
-            "dashboard.html",
-            user=username,     # XSS vulnerable
-            details=details
-        )
+    if user_id not in users:
+        return "User Not Found"
 
-    else:
-        return "Invalid Login"
+    user = users[user_id]
+    details = user_details[user_id]
+
+    return render_template(
+        "dashboard.html",
+        user=user["username"],     # ❌ XSS possible if injected
+        role=user["role"],
+        details=details
+    )
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-@app.route("/dashboard/<int:user_id>")
-def dashboard_by_id(user_id):
-
-    # ❌ NO AUTH CHECK (Broken Access Control)
-    cursor.execute(f"SELECT * FROM users WHERE id={user_id}")
-    user = cursor.fetchone()
-
-    if not user:
-        return "User not found"
-
-    username = user[1]
-    role = user[3]
-
-    cursor.execute(f"SELECT * FROM user_details WHERE user_id={user_id}")
-    details_row = cursor.fetchone()
-
-    details = {
-        "name": details_row[1],
-        "age": details_row[2],
-        "dob": details_row[3],
-        "phone": details_row[4],
-        "aadhar": details_row[5],
-        "account": details_row[6],
-        "email": details_row[7]
-    }
-
-    return render_template(
-        "dashboard.html",
-        user=username,
-        role=role,
-        details=details
-    )
-
