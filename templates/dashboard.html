@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-image: url("{{ url_for('static', filename='pic2.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.5);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            width: 520px;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            margin: 15px 0;
+        }
+
+        .row {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .label {
+            font-weight: bold;
+            width: 140px;
+            display: inline-block;
+        }
+
+        .logout {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .logout:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="overlay">
+    <div class="card">
+
+        <!-- XSS vulnerable on purpose -->
+        <h2>Welcome {{ user }}</h2>
+
+        <hr>
+
+        <div class="row"><span class="label">Name:</span> {{ details.name }}</div>
+        <div class="row"><span class="label">Age:</span> {{ details.age }}</div>
+        <div class="row"><span class="label">DOB:</span> {{ details.dob }}</div>
+        <div class="row"><span class="label">Phone:</span> {{ details.phone }}</div>
+        <div class="row"><span class="label">Email:</span> {{ details.email }}</div>
+        <div class="row"><span class="label">Aadhar:</span> {{ details.aadhar }}</div>
+        <div class="row"><span class="label">Account No:</span> {{ details.account }}</div>
+
+        <a class="logout" href="/">Logout</a>
+
+    </div>
+</div>
+
+</body>
+</html>
