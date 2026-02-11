@@ -4,14 +4,14 @@ import mysql.connector
 app = Flask(__name__)
 
 # MySQL connection
-db = mysql.connector.connect(
+"""db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="root",
     database="vulnerable_app"
 )
 
-cursor = db.cursor()
+cursor = db.cursor()"""
 
 @app.route("/")
 def login_page():
@@ -23,10 +23,13 @@ def login():
     username_input = request.form['username']
     password_input = request.form['password']
 
-    # ❌ INTENTIONALLY VULNERABLE (SQL Injection)
-    query = f"SELECT * FROM users WHERE username='{username_input}' AND password='{password_input}'"
-    cursor.execute(query)
-    row = cursor.fetchone()
+    # Temporary login without database (for Render deployment)
+
+    if username_input == "admin" and password_input == "admin123":
+        return "Login Success"
+    else:
+        return "Invalid Login"
+
 
     if row:
         # row = (id, username, password, role)
