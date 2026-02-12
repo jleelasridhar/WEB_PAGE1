@@ -73,7 +73,8 @@
     <div class="card">
 
         <!-- XSS vulnerable on purpose -->
-        <h2>Welcome {{ user }}</h2>
+        <h2>Welcome {{ user | safe }}</h2>
+
 
         <hr>
 
